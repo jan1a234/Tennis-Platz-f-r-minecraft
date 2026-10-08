@@ -11,7 +11,8 @@ jobs:
         with:
           java-version: '25'
           distribution: 'microsoft'
-      - run: chmod +x ./gradlew && ./gradlew genSources dumpClasspath dumpRuntimeClasspath --stacktrace
+      - run: chmod +x ./gradlew && ./gradlew genSources
+      - run: ./gradlew dumpClasspath dumpRuntimeClasspath
       - name: collect
         run: |
           mkdir -p /tmp/out/cp /tmp/out/rcp /tmp/out/src
