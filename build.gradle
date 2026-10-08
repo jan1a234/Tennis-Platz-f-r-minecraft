@@ -20,10 +20,31 @@ loom {
 	}
 }
 
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = "tennis-gametest"
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	testImplementation "org.junit.jupiter:junit-jupiter:5.11.4"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+test {
+	useJUnitPlatform()
 }
 
 processResources {
@@ -52,14 +73,4 @@ jar {
 	from("LICENSE") {
 		rename { "${it}_$projectName" }
 	}
-}
-
-tasks.register('dumpClasspath', Copy) {
-	from(sourceSets.client.compileClasspath.filter { it.isFile() })
-	into layout.buildDirectory.dir('cp')
-}
-
-tasks.register('dumpRuntimeClasspath', Copy) {
-	from(sourceSets.client.runtimeClasspath.filter { it.isFile() })
-	into layout.buildDirectory.dir('rcp')
 }

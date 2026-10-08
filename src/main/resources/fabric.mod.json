@@ -3,10 +3,24 @@
 	"id": "tennis",
 	"version": "${version}",
 	"name": "Tennisplatz",
+	"description": "Echtes Tennis in Minecraft: Plätze in Originalgröße, realistische Ballphysik mit Topspin und Slice, Aufschläge mit Ballwurf, Schiedsrichter, Zählweise mit Tiebreak und Tennis-Outfits im Stil der großen Legenden.",
+	"authors": ["Jan"],
+	"contact": {
+		"sources": "https://github.com/jan1a234/Tennis-Platz-f-r-minecraft"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/tennis/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"main": ["de.jan.tennis.TennisMod"]
+		"main": ["de.jan.tennis.TennisMod"],
+		"client": ["de.jan.tennis.client.TennisModClient"]
 	},
+	"mixins": [
+		{
+			"config": "tennis.client.mixins.json",
+			"environment": "client"
+		}
+	],
 	"depends": {
 		"fabricloader": ">=0.19.5",
 		"minecraft": "~26.2",

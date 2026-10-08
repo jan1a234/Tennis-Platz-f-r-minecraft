@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": "minecraft:stick",
+    "S": "minecraft:string"
+  },
+  "pattern": [
+    " SS",
+    " SS",
+    "#  "
+  ],
+  "result": {
+    "id": "tennis:tennis_racket"
+  }
+}

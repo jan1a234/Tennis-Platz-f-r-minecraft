@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:slime_ball",
+    "minecraft:yellow_dye",
+    "minecraft:white_wool"
+  ],
+  "result": {
+    "count": 4,
+    "id": "tennis:tennis_ball"
+  }
+}
