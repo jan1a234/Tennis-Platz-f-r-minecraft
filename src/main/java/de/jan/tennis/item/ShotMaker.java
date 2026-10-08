@@ -170,8 +170,8 @@ public final class ShotMaker {
 		} else {
 			target = ballPos.add(lookFlat.scale(lob ? 20 : 25));
 		}
-		Vec3 flat = horizontal(target.subtract(ballPos));
-		if (flat.length() < 4.0) {
+		Vec3 toTarget = target.subtract(ballPos);
+		if (toTarget.horizontalDistance() < 4.0) {
 			target = ballPos.add(lookFlat.scale(4.0));
 		}
 
@@ -218,7 +218,6 @@ public final class ShotMaker {
 		Function<V3, V3> spinFactory = dir -> BallPhysics.topspinAxis(dir).scale(top).add(V3.UP.scale(side));
 		BallPhysics.Shot shot = BallPhysics.solve(TennisBallEntity.toV3(ballPos), TennisBallEntity.toV3(target), speed, spinFactory, groundY, type == ShotType.LOB);
 
-		System.out.println("[Tennis-Debug] type=" + type + " ball=" + ballPos + " eye=" + eye + " look=" + look + " groundY=" + groundY + " target=" + target + " speed=" + speed + " shot=" + shot);
 		// Streuung: je härter und unsauberer, desto ungenauer
 		V3 vel = shot.velocity();
 		double yawError = Math.toRadians(random.nextGaussian() * errorDeg);

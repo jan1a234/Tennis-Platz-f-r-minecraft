@@ -45,14 +45,6 @@ jobs:
           mkdir -p screenshots
           find . -path ./screenshots -prune -o -name "*tennis-*.png" -print -exec cp {} screenshots/ \;
           ls -la screenshots
-      - name: Screenshots ins Log (Debug)
-        if: always()
-        run: |
-          for f in screenshots/*.png; do
-            echo "SHOT-BEGIN $(basename $f)"
-            base64 -w 0 "$f" | fold -w 3000 | sed 's/^/SHOT-DATA /'
-            echo "SHOT-END"
-          done
       - name: Screenshots hochladen
         if: always()
         uses: actions/upload-artifact@v7
