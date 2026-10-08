@@ -1,0 +1,13 @@
+{
+	"schemaVersion": 1,
+	"id": "tennis-gametest",
+	"version": "1.0.0",
+	"name": "Tennisplatz Spieltest",
+	"environment": "*",
+	"entrypoints": {
+		"fabric-client-gametest": ["de.jan.tennis.test.TennisClientGameTest"]
+	},
+	"depends": {
+		"tennis": "*"
+	}
+}

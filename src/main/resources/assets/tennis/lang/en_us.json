@@ -1,0 +1,9 @@
+{
+  "item.tennis.tennis_racket": "Tennis Racket",
+  "item.tennis.tennis_ball": "Tennis Ball",
+  "entity.tennis.tennis_ball": "Tennis Ball",
+  "subtitles.tennis.racket_hit": "Racket hits ball",
+  "subtitles.tennis.ball_bounce": "Ball bounces",
+  "subtitles.tennis.net_hit": "Ball hits net",
+  "subtitles.tennis.applause": "Applause"
+}

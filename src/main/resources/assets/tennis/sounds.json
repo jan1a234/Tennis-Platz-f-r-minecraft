@@ -1,0 +1,18 @@
+{
+  "racket_hit": {
+    "sounds": ["tennis:hit1", "tennis:hit2", "tennis:hit3"],
+    "subtitle": "subtitles.tennis.racket_hit"
+  },
+  "ball_bounce": {
+    "sounds": ["tennis:bounce1", "tennis:bounce2"],
+    "subtitle": "subtitles.tennis.ball_bounce"
+  },
+  "net_hit": {
+    "sounds": ["tennis:net"],
+    "subtitle": "subtitles.tennis.net_hit"
+  },
+  "applause": {
+    "sounds": ["tennis:applause"],
+    "subtitle": "subtitles.tennis.applause"
+  }
+}

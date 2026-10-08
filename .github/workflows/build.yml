@@ -1,0 +1,53 @@
+name: build
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v6
+      - name: Gradle-Wrapper prüfen
+        uses: gradle/actions/wrapper-validation@v6
+      - name: Java 25 einrichten
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - name: Bauen und Unit-Tests
+        run: chmod +x ./gradlew && ./gradlew build
+      - name: Mod-Datei hochladen
+        uses: actions/upload-artifact@v7
+        with:
+          name: tennisplatz-mod
+          path: build/libs/
+
+  client-gametest:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v6
+      - name: Java 25 einrichten
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - name: Xvfb installieren
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+      - name: Spieltest (Dedicated Server + Client)
+        run: chmod +x ./gradlew && xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClientGameTest
+      - name: Screenshots einsammeln
+        if: always()
+        run: |
+          mkdir -p screenshots
+          find . -path ./screenshots -prune -o -name "*tennis-*.png" -print -exec cp {} screenshots/ \;
+          ls -la screenshots
+      - name: Screenshots hochladen
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: spieltest-screenshots
+          path: screenshots/
