@@ -38,6 +38,7 @@ public class TennisClientGameTest implements FabricClientGameTest {
 			context.takeScreenshot("tennis-1-platz");
 
 			// 2. Outfit: der erste Spieler wird automatisch zum Rotfuchs
+			context.waitFor(mc -> mc.player.getSkin().body().texturePath().getNamespace().equals("tennis"), 100);
 			String skin = context.computeOnClient(mc -> mc.player.getSkin().body().texturePath().toString());
 			if (!skin.equals("tennis:textures/skin/rotfuchs.png")) {
 				throw new AssertionError("Erwartet Tennis-Outfit, war " + skin);

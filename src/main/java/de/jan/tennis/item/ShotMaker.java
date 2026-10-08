@@ -73,7 +73,7 @@ public final class ShotMaker {
 		Vec3 look = horizontal(player.getLookAngle());
 		Vec3 right = new Vec3(-look.z, 0, look.x);
 		Vec3 start = player.position().add(0, 1.55, 0).add(look.scale(0.45)).add(right.scale(0.2));
-		Vec3 vel = new Vec3(0, 0.29, 0).add(look.scale(0.012));
+		Vec3 vel = new Vec3(0, 0.26, 0).add(look.scale(0.012));
 		TennisBallEntity ball = TennisBallEntity.spawn((ServerLevel) player.level(), start, vel, court);
 		ball.setServeToss(true);
 		ball.playSound(ModSounds.BALL_BOUNCE, 0.2F, 1.6F);
@@ -152,7 +152,7 @@ public final class ShotMaker {
 		// Treffqualität: wie sauber der Ball im idealen Treffpunkt getroffen wurde (0 … 1)
 		double quality;
 		if (type == ShotType.SERVE || type == ShotType.SMASH) {
-			double heightError = Math.abs(heightOverFeet - 2.75) / 1.3;
+			double heightError = Math.abs(heightOverFeet - 2.85) / 1.3;
 			double apexError = Math.abs(ball.getDeltaMovement().y) / 0.28;
 			quality = 1.0 - 0.6 * Math.min(1, heightError) - 0.4 * Math.min(1, apexError);
 		} else {

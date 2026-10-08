@@ -37,6 +37,8 @@ public final class OutfitManager {
 			outfits.put(player.getUUID(), firstFree().id);
 			save();
 		}
+		// Beim Beitreten steht der Spieler noch nicht in der Spielerliste, daher direkt an ihn senden
+		send(player);
 		broadcast();
 	}
 
@@ -60,11 +62,14 @@ public final class OutfitManager {
 	}
 
 	public void broadcast() {
-		OutfitSyncPayload payload = new OutfitSyncPayload(Map.copyOf(outfits));
 		for (ServerPlayer p : server.getPlayerList().getPlayers()) {
-			if (ServerPlayNetworking.canSend(p, OutfitSyncPayload.TYPE)) {
-				ServerPlayNetworking.send(p, payload);
-			}
+			send(p);
+		}
+	}
+
+	private void send(ServerPlayer player) {
+		if (ServerPlayNetworking.canSend(player, OutfitSyncPayload.TYPE)) {
+			ServerPlayNetworking.send(player, new OutfitSyncPayload(Map.copyOf(outfits)));
 		}
 	}
 

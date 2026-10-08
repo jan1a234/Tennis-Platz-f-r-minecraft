@@ -40,8 +40,17 @@ jobs:
         if: always()
         run: |
           mkdir -p screenshots
-          find . -path ./screenshots -prune -o -name "tennis-*.png" -print -exec cp {} screenshots/ \;
+          find . -path ./screenshots -prune -o -name "*tennis-*.png" -print -exec cp {} screenshots/ \;
           ls -la screenshots
+      - name: Screenshots ins Log (Debug)
+        if: always()
+        run: |
+          for f in screenshots/*.png; do
+            ffmpeg -loglevel error -y -i "$f" -vf scale=800:-1 -q:v 4 /tmp/shot.jpg
+            echo "SHOT-BEGIN $(basename $f)"
+            base64 -w 0 /tmp/shot.jpg | fold -w 3000 | sed 's/^/SHOT-DATA /'
+            echo "SHOT-END"
+          done
       - name: Screenshots hochladen
         if: always()
         uses: actions/upload-artifact@v7
