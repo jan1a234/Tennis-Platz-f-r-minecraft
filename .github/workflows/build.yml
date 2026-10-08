@@ -1,5 +1,8 @@
 name: build
-on: [pull_request, push]
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 jobs:
   build:
@@ -46,9 +49,8 @@ jobs:
         if: always()
         run: |
           for f in screenshots/*.png; do
-            ffmpeg -loglevel error -y -i "$f" -vf scale=800:-1 -q:v 4 /tmp/shot.jpg
             echo "SHOT-BEGIN $(basename $f)"
-            base64 -w 0 /tmp/shot.jpg | fold -w 3000 | sed 's/^/SHOT-DATA /'
+            base64 -w 0 "$f" | fold -w 3000 | sed 's/^/SHOT-DATA /'
             echo "SHOT-END"
           done
       - name: Screenshots hochladen

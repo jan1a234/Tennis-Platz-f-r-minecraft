@@ -70,7 +70,14 @@ public class TennisClientGameTest implements FabricClientGameTest {
 			});
 			// Ball erreicht nach etwa 11 Ticks den höchsten Punkt
 			context.waitTicks(11);
-			server.runOnServer(s -> ShotMaker.hit(player(s), ball, 0.8));
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				Court c = TennisServer.get().courts.all().getFirst();
+				System.out.println("[Tennis-Test] vor Schlag: Ball u=" + c.u(ball.position()) + " h=" + (ball.getY() - p.getY())
+					+ " vy=" + ball.getDeltaMovement().y + " Spieler u=" + c.u(p.position()) + " yaw=" + p.getYRot() + " pitch=" + p.getXRot());
+				ShotMaker.hit(p, ball, 0.8);
+				System.out.println("[Tennis-Test] nach Schlag: v=" + ball.getDeltaMovement() + " spin=" + ball.getSpin());
+			});
 			context.waitTicks(3);
 			context.takeScreenshot("tennis-3-aufschlag");
 			server.waitFor(s -> firstBounce != null, 100);
