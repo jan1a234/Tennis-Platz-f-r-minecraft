@@ -58,3 +58,8 @@ tasks.register('dumpClasspath', Copy) {
 	from(sourceSets.client.compileClasspath.filter { it.isFile() })
 	into layout.buildDirectory.dir('cp')
 }
+
+tasks.register('dumpRuntimeClasspath', Copy) {
+	from(sourceSets.client.runtimeClasspath.filter { it.isFile() })
+	into layout.buildDirectory.dir('rcp')
+}

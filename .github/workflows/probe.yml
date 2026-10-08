@@ -1,5 +1,7 @@
 name: probe
 on: [push]
+permissions:
+  contents: write
 jobs:
   probe:
     runs-on: ubuntu-24.04
@@ -9,9 +11,20 @@ jobs:
         with:
           java-version: '25'
           distribution: 'microsoft'
-      - run: chmod +x ./gradlew && ./gradlew build dumpClasspath --stacktrace
-      - run: ls -la build/cp && du -sh build/cp
-      - uses: actions/upload-artifact@v7
-        with:
-          name: classpath
-          path: build/cp/
+      - run: chmod +x ./gradlew && ./gradlew genSources dumpClasspath dumpRuntimeClasspath --stacktrace
+      - name: collect
+        run: |
+          mkdir -p /tmp/out/cp /tmp/out/rcp /tmp/out/src
+          cp build/cp/* /tmp/out/cp/
+          for f in build/rcp/*; do [ -f "/tmp/out/cp/$(basename $f)" ] || cp "$f" /tmp/out/rcp/; done
+          find ~/.gradle .gradle -name "*sources*.jar" -path "*minecraft*" -exec cp {} /tmp/out/src/ \; || true
+          find ~/.gradle -name "fabric-*sources*.jar" -exec cp {} /tmp/out/src/ \; || true
+          find /tmp/out -type f -size +95M -print -delete
+          du -sh /tmp/out/*; ls -la /tmp/out/src
+      - name: push to temp branch
+        run: |
+          cd /tmp/out
+          git init -q -b tmp-classpath
+          git config user.name ci; git config user.email ci@example.com
+          git add -A; git commit -qm "temp classpath"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" tmp-classpath
