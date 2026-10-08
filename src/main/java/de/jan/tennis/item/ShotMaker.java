@@ -216,7 +216,16 @@ public final class ShotMaker {
 		final double top = topspin;
 		final double side = sidespin;
 		Function<V3, V3> spinFactory = dir -> BallPhysics.topspinAxis(dir).scale(top).add(V3.UP.scale(side));
-		BallPhysics.Shot shot = BallPhysics.solve(TennisBallEntity.toV3(ballPos), TennisBallEntity.toV3(target), speed, spinFactory, groundY, type == ShotType.LOB);
+		V3 start = TennisBallEntity.toV3(ballPos);
+		V3 aim = TennisBallEntity.toV3(target);
+		BallPhysics.Shot shot = BallPhysics.solve(start, aim, speed, spinFactory, groundY, type == ShotType.LOB);
+		// Wer flach und hart ins nahe Feld zielt, muss Tempo rausnehmen, sonst landet der Ball sicher im Netz
+		if (court != null && Math.signum(court.u(ballPos)) != Math.signum(court.u(target))) {
+			for (int i = 0; i < 10 && netMargin(court, start, shot.velocity(), shot.spin(), groundY) < 0.12; i++) {
+				speed *= 0.93;
+				shot = BallPhysics.solve(start, aim, speed, spinFactory, groundY, type == ShotType.LOB);
+			}
+		}
 
 		// Streuung: je härter und unsauberer, desto ungenauer
 		V3 vel = shot.velocity();
@@ -241,6 +250,29 @@ public final class ShotMaker {
 		if (match != null) {
 			match.onShot(player, type, kmh);
 		}
+	}
+
+	/** Abstand des Balls über der Netzkante, wenn er die Netzebene überquert (negativ: Netz). */
+	static double netMargin(Court court, V3 start, V3 vel, V3 spin, double groundY) {
+		V3 pos = start;
+		double side = Math.signum(court.u(start.x(), start.z()));
+		double netTop = groundY + 1.0 + BallPhysics.BALL_RADIUS;
+		for (int t = 0; t < 200; t++) {
+			vel = BallPhysics.stepVelocity(vel, spin);
+			spin = spin.scale(BallPhysics.SPIN_DECAY);
+			V3 next = pos.add(vel);
+			if (next.y() < groundY) {
+				return Double.MAX_VALUE;
+			}
+			double u0 = court.u(pos.x(), pos.z());
+			double u1 = court.u(next.x(), next.z());
+			if (Math.signum(u1) != side) {
+				double f = u0 / (u0 - u1);
+				return pos.y() + (next.y() - pos.y()) * f - netTop;
+			}
+			pos = next;
+		}
+		return Double.MAX_VALUE;
 	}
 
 	private static V3 tilt(V3 v, double angle) {
