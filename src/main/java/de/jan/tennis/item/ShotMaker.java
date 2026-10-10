@@ -5,6 +5,7 @@ import de.jan.tennis.TennisServer;
 import de.jan.tennis.court.Court;
 import de.jan.tennis.entity.TennisBallEntity;
 import de.jan.tennis.logic.BallPhysics;
+import de.jan.tennis.logic.CourtGeometry;
 import de.jan.tennis.logic.V3;
 import de.jan.tennis.match.TennisMatch;
 import de.jan.tennis.registry.ModItems;
@@ -83,8 +84,11 @@ public final class ShotMaker {
 	/** Rechtsklick losgelassen. */
 	public static void swing(ServerPlayer player, int chargeTicks) {
 		player.swing(InteractionHand.MAIN_HAND, true);
-		double power = Math.clamp((chargeTicks - 2) / 18.0, 0.0, 1.0);
-		findBall(player).ifPresent(ball -> hit(player, ball, power));
+		findBall(player).ifPresent(ball -> {
+			// Beim Aufschlag fällt volle Ausholzeit mit dem höchsten Punkt des Ballwurfs zusammen
+			double power = ball.isServeToss() ? Math.clamp((chargeTicks - 2) / 9.0, 0.0, 1.0) : Math.clamp((chargeTicks - 2) / 14.0, 0.0, 1.0);
+			hit(player, ball, power);
+		});
 	}
 
 	/** Linksklick auf den Ball: kurzer Schlag ohne Ausholen. */
@@ -152,12 +156,12 @@ public final class ShotMaker {
 		// Treffqualität: wie sauber der Ball im idealen Treffpunkt getroffen wurde (0 … 1)
 		double quality;
 		if (type == ShotType.SERVE || type == ShotType.SMASH) {
-			double heightError = Math.abs(heightOverFeet - 2.85) / 1.3;
-			double apexError = Math.abs(ball.getDeltaMovement().y) / 0.28;
+			double heightError = Math.abs(heightOverFeet - 2.75) / 1.8;
+			double apexError = Math.abs(ball.getDeltaMovement().y) / 0.45;
 			quality = 1.0 - 0.6 * Math.min(1, heightError) - 0.4 * Math.min(1, apexError);
 		} else {
-			double distError = Math.abs(toBall.length() - 1.35) / 1.6;
-			double heightError = Math.abs(heightOverFeet - 1.0) / 1.5;
+			double distError = Math.abs(toBall.length() - 1.35) / 2.2;
+			double heightError = Math.abs(heightOverFeet - 1.0) / 2.0;
 			quality = 1.0 - 0.6 * Math.min(1, distError) - 0.4 * Math.min(1, heightError);
 		}
 		quality = Math.clamp(quality, 0.0, 1.0);
@@ -174,6 +178,9 @@ public final class ShotMaker {
 		if (toTarget.horizontalDistance() < 4.0) {
 			target = ballPos.add(lookFlat.scale(4.0));
 		}
+		if (court != null) {
+			target = aimAssist(court, type, player.position(), target);
+		}
 
 		double speed;
 		double topspin;
@@ -181,36 +188,36 @@ public final class ShotMaker {
 		double errorDeg;
 		switch (type) {
 			case SERVE -> {
-				speed = lerp(1.25, 2.65, power) * (0.75 + 0.25 * quality);
-				topspin = slice ? 0.16 : 0.04;
+				speed = lerp(1.2, 1.75, power) * (0.85 + 0.15 * quality);
+				topspin = slice ? 0.16 : 0.06;
 				sidespin = slice ? 0.12 : 0.0;
 				if (slice) {
-					speed *= 0.86;
+					speed *= 0.9;
 				}
-				errorDeg = 0.35 + 2.2 * (1 - quality) + 1.0 * power;
+				errorDeg = 0.2 + 1.0 * (1 - quality) + 0.4 * power;
 			}
 			case SMASH -> {
-				speed = lerp(1.4, 2.4, power) * (0.75 + 0.25 * quality);
+				speed = lerp(1.2, 1.6, power) * (0.85 + 0.15 * quality);
 				topspin = 0.05;
-				errorDeg = 0.6 + 2.5 * (1 - quality) + 1.0 * power;
+				errorDeg = 0.3 + 1.2 * (1 - quality) + 0.5 * power;
 			}
 			case LOB -> {
-				speed = lerp(0.85, 1.3, power);
+				speed = lerp(0.85, 1.1, power);
 				topspin = slice ? -0.08 : 0.1;
-				errorDeg = 0.8 + 2.0 * (1 - quality);
+				errorDeg = 0.4 + 1.0 * (1 - quality);
 			}
 			case VOLLEY -> {
-				speed = lerp(0.75, 1.45, power) * (0.8 + 0.2 * quality);
+				speed = lerp(0.8, 1.15, power) * (0.85 + 0.15 * quality);
 				topspin = slice ? -0.1 : 0.03;
-				errorDeg = 0.6 + 2.5 * (1 - quality) + 1.2 * power;
+				errorDeg = 0.3 + 1.2 * (1 - quality) + 0.5 * power;
 			}
 			default -> {
-				speed = lerp(0.8, 1.75, power) * (0.8 + 0.2 * quality);
-				topspin = slice ? -0.12 : 0.12 + 0.12 * power;
+				speed = lerp(0.9, 1.3, power) * (0.85 + 0.15 * quality);
+				topspin = slice ? -0.12 : 0.12 + 0.08 * power;
 				if (slice) {
-					speed *= 0.85;
+					speed *= 0.9;
 				}
-				errorDeg = 0.6 + 3.0 * (1 - quality) + 1.5 * power;
+				errorDeg = 0.3 + 1.4 * (1 - quality) + 0.6 * power;
 			}
 		}
 		final double top = topspin;
@@ -219,6 +226,11 @@ public final class ShotMaker {
 		V3 start = TennisBallEntity.toV3(ballPos);
 		V3 aim = TennisBallEntity.toV3(target);
 		BallPhysics.Shot shot = BallPhysics.solve(start, aim, speed, spinFactory, groundY, type == ShotType.LOB);
+		// Zu langsam, um das Ziel zu erreichen: etwas mehr Tempo, statt den Ball zu kurz zu spielen
+		for (int i = 0; i < 8 && !shot.reachable(); i++) {
+			speed *= 1.08;
+			shot = BallPhysics.solve(start, aim, speed, spinFactory, groundY, type == ShotType.LOB);
+		}
 		// Wer flach und hart ins nahe Feld zielt, muss Tempo rausnehmen, sonst landet der Ball sicher im Netz
 		if (court != null && Math.signum(court.u(ballPos)) != Math.signum(court.u(target))) {
 			for (int i = 0; i < 10 && netMargin(court, start, shot.velocity(), shot.spin(), groundY) < 0.12; i++) {
@@ -250,6 +262,27 @@ public final class ShotMaker {
 		if (match != null) {
 			match.onShot(player, type, kmh);
 		}
+	}
+
+	/**
+	 * Zielhilfe: Das Ziel wird ins gegnerische Feld gezogen, beim Aufschlag ins diagonale Aufschlagfeld.
+	 * Die Streuung kann den Ball trotzdem ins Aus tragen, aber grobes Verzielen wird verziehen.
+	 */
+	static Vec3 aimAssist(Court court, ShotType type, Vec3 playerPos, Vec3 target) {
+		double pu = court.u(playerPos);
+		double pv = court.v(playerPos);
+		int otherSide = pu < 0 ? 1 : -1;
+		double u = court.u(target);
+		double v = court.v(target);
+		if (type == ShotType.SERVE) {
+			int boxSign = pv < 0 ? 1 : -1;
+			u = otherSide * Math.clamp(otherSide * u, 2.0, CourtGeometry.SERVICE_LINE - 1.2);
+			v = boxSign * Math.clamp(boxSign * v, 0.6, CourtGeometry.SINGLES_HALF_WIDTH - 1.0);
+		} else {
+			u = otherSide * Math.clamp(otherSide * u, 2.5, CourtGeometry.HALF_LENGTH - 1.8);
+			v = Math.clamp(v, -(CourtGeometry.SINGLES_HALF_WIDTH - 1.0), CourtGeometry.SINGLES_HALF_WIDTH - 1.0);
+		}
+		return court.world(u, v, target.y);
 	}
 
 	/** Abstand des Balls über der Netzkante, wenn er die Netzebene überquert (negativ: Netz). */
