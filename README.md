@@ -26,15 +26,17 @@ Er braucht rund 39 × 23 Blöcke freie Fläche.
 
 | Aktion | Taste |
 |---|---|
-| Ausholen | **Rechtsklick halten**: je länger, desto härter (volle Kraft nach 1 Sekunde) |
+| Ausholen | **Rechtsklick halten**: je länger, desto härter (volle Kraft nach knapp 1 Sekunde) |
 | Schlagen | **Rechtsklick loslassen** |
-| Aufschlag | Ohne Ball in der Nähe wirft Rechtsklick den Ball hoch. Halten, und im höchsten Punkt loslassen. |
+| Aufschlag | Ohne Ball in der Nähe wirft Rechtsklick den Ball hoch. Halten und im höchsten Punkt loslassen: das ist auch der härteste Aufschlag. |
 | Zielen | Mit dem **Fadenkreuz** auf den Punkt, an dem der Ball aufkommen soll |
 | Slice / Unterschnitt | **Schleichen** beim Schlag (beim Aufschlag: Slice-/Kick-Aufschlag) |
 | Lob | Beim Schlag **nach oben schauen** |
 | Schneller Block-Schlag | **Linksklick** auf den Ball |
 
 Tempo kostet Genauigkeit: Harte Schläge und schlecht getroffene Bälle streuen mehr.
+Eine **Zielhilfe** zieht dein Ziel ins gegnerische Feld, beim Aufschlag ins richtige Aufschlagfeld.
+Grob daneben zielen wird also verziehen, ins Aus oder Netz geht ein Ball nur durch Streuung.
 Die Anzeige über der Hotbar zeigt nach jedem Schlag Schlagart und Tempo in km/h.
 
 ## Was realistisch ist
@@ -42,7 +44,7 @@ Die Anzeige über der Hotbar zeigt nach jedem Schlag Schlagart und Tempo in km/h
 - **Platz in Originalproportionen**: 25 × 13 Blöcke Spielfeld (echt 23,77 × 10,97 m), Einzel- und Doppellinien,
   Aufschlagfelder, Netz, Auslauf, Zaun und Flutlicht. Linien zählen als „im Feld".
 - **Ballphysik**: Schwerkraft, Luftwiderstand und Magnus-Effekt. Topspin taucht ab und springt hoch weg,
-  Slice segelt und bleibt flach. Ein 190-km/h-Aufschlag kommt deutlich langsamer an.
+  Slice segelt und bleibt flach. Damit man in Minecraft mithalten kann, sind die Bälle etwas langsamer als im Profitennis (Aufschläge bis ca. 125 km/h).
 - **Beläge**: Rasen ist schnell und flach, Sand langsam mit hohem Absprung, Hartplatz dazwischen.
 - **Aufschlag**: Ballwurf, Treffpunkt entscheidet (im höchsten Punkt = sauber), erster und zweiter Aufschlag,
   Netzaufschlag (Let) wird wiederholt, Doppelfehler, Ass. Aufgeschlagen wird hinter der Grundlinie,
